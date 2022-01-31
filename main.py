@@ -10,8 +10,12 @@ if __name__ == '__main__':
     os_option = input("1 : gooroom, 2 : window10\n")
     cpu_model = input("1 : westmere, 2 : host-passthrough\n")
     cpu_cache_mode = input("1 : disable, 2 : passthrough\n")
+    disk_type = input("1 : ide, 2 : virtio")
+    disk_aio_mode = input("1 : native, 2 : queue")
+    video_model = input("1: cirrus, 2: virtio")
 
-    param = {'cpu_model' : cpu_model, 'cpu_cache_mode' : cpu_cache_mode }
+    param = {'cpu_model' : cpu_model, 'cpu_cache_mode' : cpu_cache_mode, 'disk_type': disk_type,
+            'disk_aio_mode' : disk_aio_mode, 'video_model': video_model}
 
     suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
     new_fname = "_".join([fname, suffix]) + ".xml" # e.g. 'mylogfile_120508_171442'
