@@ -1,39 +1,29 @@
-<domain type='kvm' id='1' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
-  <name>Win10</name>
-  <uuid>4fd8244a-6bd8-4065-be0a-df53872e94ed</uuid>
-  <memory unit='KiB'>14680064</memory>
-  <currentMemory unit='KiB'>14680064</currentMemory>
-  <memoryBacking>
-    <hugepages/>
-  </memoryBacking>
-  <vcpu placement='static'>8</vcpu>
-  <cputune>
-    <vcpupin vcpu='0' cpuset='4'/>
-    <vcpupin vcpu='1' cpuset='5'/>
-    <vcpupin vcpu='2' cpuset='6'/>
-    <vcpupin vcpu='3' cpuset='7'/>
-  </cputune>
-  <resource>
-    <partition>/machine</partition>
-  </resource>
+<!--
+WARNING: THIS IS AN AUTO-GENERATED FILE. CHANGES TO IT ARE LIKELY TO BE
+OVERWRITTEN AND LOST. Changes to this xml configuration should be made using:
+  virsh edit udesktop20_04-03
+or other application using the libvirt API.
+-->
+
+<domain type='kvm'>
+  <name>udesktop20_04-03</name>
+  <uuid>2b7c78ce-2977-4e2c-b690-c5661aeb508b</uuid>
+  <metadata>
+    <libosinfo:libosinfo xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">
+      <libosinfo:os id="http://ubuntu.com/ubuntu/19.10"/>
+    </libosinfo:libosinfo>
+  </metadata>
+  <memory unit='KiB'>4194304</memory>
+  <currentMemory unit='KiB'>4194304</currentMemory>
+  <vcpu placement='static'>2</vcpu>
   <os>
-    <type arch='x86_64' machine='pc-i440fx-xenial'>hvm</type>
-    <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
-    <nvram>/var/lib/libvirt/qemu/nvram/Win10_VARS.fd</nvram>
-    <bootmenu enable='yes'/>
+    <type arch='x86_64' machine='pc-q35-rhel8.2.0'>hvm</type>
+    <boot dev='cdrom'/>
+    <boot dev='hd'/>
   </os>
   <features>
     <acpi/>
     <apic/>
-    <hyperv>
-      <relaxed state='on'/>
-      <vapic state='on'/>
-      <spinlocks state='on' retries='8191'/>
-      <vendor_id state='on' value='324832324afc'/>
-    </hyperv>
-    <kvm>
-      <hidden state='on'/>
-    </kvm>
   </features>
   {% if param.cpu_model == '1' %}
   <cpu mode='host-passthrough'>
@@ -42,158 +32,139 @@
     {% elif param.cache_mode == '2' %}
     <cache mode="disable"/>
     {% endif %}
-    <topology sockets='1' cores='4' threads='2'/>
   </cpu>
   {% elif param.cpu_model == '2' %}
-  <cpu mode='custom' match='exact'>
-    <model name="Westmere"/>
+  <cpu mode="custom" match="exact">
     {% if param.cache_mode == '1' %}
     <cache mode="passthrough"/>
     {% elif param.cache_mode == '2' %}
     <cache mode="disable"/>
     {% endif %}
-    <feature policy='require' name='pcid'/>
+    <model>Haswell-noTSX</model>
   </cpu>
   {% endif %}
-  <clock offset='localtime'>
+  <clock offset='utc'>
     <timer name='rtc' tickpolicy='catchup'/>
     <timer name='pit' tickpolicy='delay'/>
     <timer name='hpet' present='no'/>
-    <timer name='hypervclock' present='yes'/>
   </clock>
   <on_poweroff>destroy</on_poweroff>
   <on_reboot>restart</on_reboot>
-  <on_crash>restart</on_crash>
+  <on_crash>destroy</on_crash>
   <pm>
     <suspend-to-mem enabled='no'/>
     <suspend-to-disk enabled='no'/>
   </pm>
   <devices>
-    <emulator>/usr/bin/kvm-spice</emulator>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native'/>
-      <source dev='/dev/sdd'/>
-      <backingStore/>
-      <target dev='vda' bus='virtio'/>
-      <alias name='virtio-disk0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native'/>
-      <source dev='/dev/sda'/>
-      <backingStore/>
-      <target dev='vdb' bus='virtio'/>
-      <boot order='2'/>
-      <alias name='virtio-disk1'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x0d' function='0x0'/>
-    </disk>
+    <emulator>/usr/libexec/qemu-kvm</emulator>
+
     <disk type='file' device='disk'>
-      <driver name='qemu' type='qcow2'/>
-      <source file='/var/lib/libvirt/images/Win10.qcow2'/>
-      <backingStore/>
-      <target dev='vdc' bus='virtio'/>
-      <alias name='virtio-disk2'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+      {% if param.disk_aio_mode == '1' %}
+      <driver name='qemu' type='qcow2' cache='none' io='threads'/>
+      {% elif param.disk_aio_mode == '2' %}
+      <driver name='qemu' type='qcow2' cache='none' io='native'/>
+      {% elif param.disk_aio_mode == '3' %}
+      <driver name='qemu' type='qcow2' cache='none' queues='4' queue_size='256'/>
+      {% endif %}
+      <source file='/kvm/disk/udesktop20_04-03.img'/>
+      <target dev='vda' bus='virtio'/>
     </disk>
-    <controller type='scsi' index='0' model='virtio-scsi'>
-      <alias name='scsi0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
-    </controller>
-    <controller type='pci' index='0' model='pci-root'>
-      <alias name='pci.0'/>
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <target dev='sda' bus='sata'/>
+      <readonly/>
+      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+    </disk>
+    <controller type='usb' index='0' model='qemu-xhci' ports='15'>
+      <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
     </controller>
     <controller type='sata' index='0'>
-      <alias name='sata0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x0b' function='0x0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x1f' function='0x2'/>
     </controller>
+    <controller type='pci' index='0' model='pcie-root'/>
     <controller type='virtio-serial' index='0'>
-      <alias name='virtio-serial0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
+      <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
     </controller>
-    <controller type='usb' index='0' model='ich9-ehci1'>
-      <alias name='usb'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x0e' function='0x7'/>
+    <controller type='pci' index='1' model='pcie-root-port'>
+      <model name='pcie-root-port'/>
+      <target chassis='1' port='0x10'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0' multifunction='on'/>
     </controller>
-    <controller type='usb' index='0' model='ich9-uhci1'>
-      <alias name='usb'/>
-      <master startport='0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x0e' function='0x0' multifunction='on'/>
+    <controller type='pci' index='2' model='pcie-root-port'>
+      <model name='pcie-root-port'/>
+      <target chassis='2' port='0x11'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x1'/>
     </controller>
-    <controller type='usb' index='0' model='ich9-uhci2'>
-      <alias name='usb'/>
-      <master startport='2'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x0e' function='0x1'/>
+    <controller type='pci' index='3' model='pcie-root-port'>
+      <model name='pcie-root-port'/>
+      <target chassis='3' port='0x12'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x2'/>
     </controller>
-    <controller type='usb' index='0' model='ich9-uhci3'>
-      <alias name='usb'/>
-      <master startport='4'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x0e' function='0x2'/>
+    <controller type='pci' index='4' model='pcie-root-port'>
+      <model name='pcie-root-port'/>
+      <target chassis='4' port='0x13'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x3'/>
     </controller>
-    <channel type='spicevmc'>
-      <target type='virtio' name='com.redhat.spice.0' state='disconnected'/>
-      <alias name='channel0'/>
+    <controller type='pci' index='5' model='pcie-root-port'>
+      <model name='pcie-root-port'/>
+      <target chassis='5' port='0x14'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x4'/>
+    </controller>
+    <controller type='pci' index='6' model='pcie-root-port'>
+      <model name='pcie-root-port'/>
+      <target chassis='6' port='0x15'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x5'/>
+    </controller>
+    <controller type='pci' index='7' model='pcie-root-port'>
+      <model name='pcie-root-port'/>
+      <target chassis='7' port='0x16'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x6'/>
+    </controller>
+    <interface type='network'>
+      <mac address='52:54:00:0b:39:83'/>
+      <source network='default'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
+    </interface>
+    <serial type='pty'>
+      <target type='isa-serial' port='0'>
+        <model name='isa-serial'/>
+      </target>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <channel type='unix'>
+      <target type='virtio' name='org.qemu.guest_agent.0'/>
       <address type='virtio-serial' controller='0' bus='0' port='1'/>
     </channel>
-    <input type='mouse' bus='ps2'>
-      <alias name='input0'/>
+    <input type='tablet' bus='usb'>
+      <address type='usb' bus='0' port='1'/>
     </input>
-    <input type='keyboard' bus='ps2'>
-      <alias name='input1'/>
-    </input>
-    <graphics type='spice' port='5910' autoport='no' listen='127.0.0.1'>
-      <listen type='address' address='127.0.0.1'/>
-      <image compression='off'/>
+    <input type='mouse' bus='ps2'/>
+    <input type='keyboard' bus='ps2'/>
+    <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'>
+      <listen type='address' address='0.0.0.0'/>
     </graphics>
     <video>
-      <model type='cirrus' vram='16384' heads='1' primary='yes'/>
-      <alias name='video0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
+      {% if param.video_model == '1' %}
+      <model type='vga' vram='16384' heads='1'>
+        <acceleration accel3d='yes'/>
+      </model>
+      <driver name='qemu'/>
+<!--      <model type='qxl' ram='65536' vram='65536' vgamem='16384' heads='1' primary='yes'/>-->
+<!--      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>-->
+      {% elif param.video_model == '2' %}
+      <model type='cirrus' vram='16384' heads='1'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>
+      {% endif %}
     </video>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
-      <driver name='vfio'/>
-      <source>
-        <address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
-      </source>
-      <alias name='hostdev0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
-      <driver name='vfio'/>
-      <source>
-        <address domain='0x0000' bus='0x01' slot='0x00' function='0x1'/>
-      </source>
-      <alias name='hostdev1'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x0a' function='0x0'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
-      <driver name='vfio'/>
-      <source>
-        <address domain='0x0000' bus='0x04' slot='0x00' function='0x0'/>
-      </source>
-      <alias name='hostdev2'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
-    </hostdev>
-    <redirdev bus='usb' type='spicevmc'>
-      <alias name='redir0'/>
-      <address type='usb' bus='0' port='2'/>
-    </redirdev>
     <memballoon model='virtio'>
-      <alias name='balloon0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x09' function='0x0'/>
+      <address type='pci' domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
     </memballoon>
+    <rng model='virtio'>
+      <backend model='random'>/dev/urandom</backend>
+      <address type='pci' domain='0x0000' bus='0x06' slot='0x00' function='0x0'/>
+    </rng>
   </devices>
-  <seclabel type='dynamic' model='apparmor' relabel='yes'>
-    <label>libvirt-4fd8244a-6bd8-4065-be0a-df53872e94ed</label>
-    <imagelabel>libvirt-4fd8244a-6bd8-4065-be0a-df53872e94ed</imagelabel>
-  </seclabel>
-  <seclabel type='dynamic' model='dac' relabel='yes'>
-    <label>+0:+0</label>
-    <imagelabel>+0:+0</imagelabel>
-  </seclabel>
-  <qemu:commandline>
-    <qemu:arg value='-netdev'/>
-    <qemu:arg value='tap,id=net0,ifname=tap0,script=/etc/qemu/wlp5s0-tap0,downscript=no'/>
-    <qemu:arg value='-device'/>
-    <qemu:arg value='rtl8139,netdev=net0,mac=52:54:00:12:34:56'/>
-  </qemu:commandline>
 </domain>
